@@ -1,0 +1,20 @@
+# Бинарные файлы
+*.exe
+*.dll
+*.obj
+*.lib
+*.pdb
+
+# Логи и временные файлы
+*.log
+*.tmp
+
+# Каталоги Visual Studio
+.vs/
+Debug/
+Release/
+
+# Файлы проекта, генерируемые автоматически
+*.user
+*.suo
+*.vcxproj.*
