@@ -1,20 +1,20 @@
-#include "class_labyrint.h"
+#include "Labirinth.h"
 
-Labirinth::Labirinth(short labyrintSizeX, short labirintSizeY) :
-	X(labyrintSizeX), Y(labirintSizeY),
+Labirinth::Labirinth() :
+	X(charLab.labyrinthWidth), Y(charLab.labyrinthHeight),
 	busyX(X + 2), busyY(Y + 2)
 {
 	// Инициализация матрицы начальными значениями: 0 и 3.
-	busyCoordLabyrint = new short* [busyX];
+	charLab.busyCoordLabyrint = new short* [busyX];
 	for (short x = 0; x < busyX; x++) {
-		busyCoordLabyrint[x] = new short[busyY];
+		charLab.busyCoordLabyrint[x] = new short[busyY];
 		for (short y = 0; y < busyY; y++) {
 			if (x == 1 || x == busyX - 2 || 
 				y == 1 || y == busyY - 2) {
-				busyCoordLabyrint[x][y] = 3;
+				charLab.busyCoordLabyrint[x][y] = 3;
 				continue;
 			}
-			busyCoordLabyrint[x][y] = 0;
+			charLab.busyCoordLabyrint[x][y] = 0;
 		}
 	}
 
@@ -24,57 +24,47 @@ Labirinth::Labirinth(short labyrintSizeX, short labirintSizeY) :
 void Labirinth::print_labyrint() {
 	for (int y = 1; y < busyY - 1; y++) {
 		for (int x = 1; x < busyX - 1; x++) {
-			// Меняем цвета.
-			if (busyCoordLabyrint[x][y] == 0) {
-				cout << "\033[47;30m";
-			}
-			else if (busyCoordLabyrint[x][y] == 1) {
-				cout << "\033[0m";
-			}
-			else if (busyCoordLabyrint[x][y] == 2) {
-				cout << "\033[41m";
-			}
-			else if (busyCoordLabyrint[x][y] == 3) {
+			// Стандартный цвет для неисследованной области.
+			cout << "\033[47;30m";
+			// Если граница.
+			if (charLab.busyCoordLabyrint[x][y] == 3) {
 				cout << "\033[42m";
-			}
-			else if (busyCoordLabyrint[x][y] == 4) {
-				cout << "\033[43m";
 			}
 			setCursorPosition(x - 1, y - 1);
 			cout << " ";
 		}
 	}
-	cout << "\033[0m";
-	cout << endl;
+	// Окрашивание ячейки начальной позиции персонажа.
+	setCursorPosition(1, 1); 
+	cout << "\033[43m";
+	cout << " ";
 
-	for (int y = 0; y < busyY; y++) {
-		for (int x = 0; x < busyX; x++) {
-			cout << busyCoordLabyrint[x][y];
-		}
-		cout << endl;
-	}
+	cout << "\033[0m";
+	setCursorPosition(X - 2, Y - 2);
+	cout << " \n\n";
+	cout << "Осталось " << charLab.attempts << " попыток";
 }
 
 void Labirinth::addToAvailableCoord(cell p) {
-	busyCoordLabyrint[p.x ][p.y] = 1;
+	charLab.busyCoordLabyrint[p.x ][p.y] = 1;
 
 	// Меняем индекс ячейки между новообразовавшейся ячейкой
 	// под индексом 1 и ее родителем.
 	// Рисует вверх
 	if (p.parentY < p.y) {
-		busyCoordLabyrint[p.x][p.y - 1] = 1;
+		charLab.busyCoordLabyrint[p.x][p.y - 1] = 1;
 	}
 	//Рисует вправо.
 	else if (p.parentX > p.x) {
-		busyCoordLabyrint[p.x + 1][p.y] = 1;
+		charLab.busyCoordLabyrint[p.x + 1][p.y] = 1;
 	}
 	// Рисует вниз.
 	else if (p.parentY > p.y) {
-		busyCoordLabyrint[p.x][p.y + 1] = 1;
+		charLab.busyCoordLabyrint[p.x][p.y + 1] = 1;
 	}
 	// Рисует влево.
 	else if (p.parentX < p.x) {
-		busyCoordLabyrint[p.x - 1][p.y] = 1;
+		charLab.busyCoordLabyrint[p.x - 1][p.y] = 1;
 	}
 
 	// Формирование дочерних ячеек для новообразовавшейся ячейки
@@ -83,27 +73,27 @@ void Labirinth::addToAvailableCoord(cell p) {
 	// чтобы ее индекс был равен 0, и ячейка между новообразовавшейся 
 	// и предпологаемой дочерней ячейкой не была границей (под индексом 3).
 	// Проверка вверх.
-	if (busyCoordLabyrint[p.x][p.y - 2] == 0 &&
-		busyCoordLabyrint[p.x][p.y - 1] != 3) {
-		busyCoordLabyrint[p.x][p.y - 2] = 2;
+	if (charLab.busyCoordLabyrint[p.x][p.y - 2] == 0 &&
+		charLab.busyCoordLabyrint[p.x][p.y - 1] != 3) {
+		charLab.busyCoordLabyrint[p.x][p.y - 2] = 2;
 		availableCoord.push_back(cell(p.x, p.y - 2, p.x, p.y));
 	}
 	// Проверка вправо.
-	if (busyCoordLabyrint[p.x + 2][p.y] == 0 &&
-		busyCoordLabyrint[p.x + 1][p.y] != 3) {
-		busyCoordLabyrint[p.x + 2][p.y] = 2;
+	if (charLab.busyCoordLabyrint[p.x + 2][p.y] == 0 &&
+		charLab.busyCoordLabyrint[p.x + 1][p.y] != 3) {
+		charLab.busyCoordLabyrint[p.x + 2][p.y] = 2;
 		availableCoord.push_back(cell(p.x + 2, p.y, p.x, p.y));
 	}
 	// Проверка вниз.
-	if (busyCoordLabyrint[p.x][p.y + 2] == 0 &&
-		busyCoordLabyrint[p.x][p.y + 1] != 3) {
-		busyCoordLabyrint[p.x][p.y + 2] = 2;
+	if (charLab.busyCoordLabyrint[p.x][p.y + 2] == 0 &&
+		charLab.busyCoordLabyrint[p.x][p.y + 1] != 3) {
+		charLab.busyCoordLabyrint[p.x][p.y + 2] = 2;
 		availableCoord.push_back(cell(p.x, p.y + 2, p.x, p.y));
 	}
 	// Проверка влево.
-	if (busyCoordLabyrint[p.x - 2][p.y] == 0 &&
-		busyCoordLabyrint[p.x - 1][p.y] != 3) {
-		busyCoordLabyrint[p.x - 2][p.y] = 2;
+	if (charLab.busyCoordLabyrint[p.x - 2][p.y] == 0 &&
+		charLab.busyCoordLabyrint[p.x - 1][p.y] != 3) {
+		charLab.busyCoordLabyrint[p.x - 2][p.y] = 2;
 		availableCoord.push_back(cell(p.x - 2, p.y, p.x, p.y));
 	}
 		
@@ -116,7 +106,7 @@ void Labirinth::addToAvailableCoord(cell p) {
 
 void Labirinth::generation_labyrint() {
 	// Добавление ячейки из которой будет генерироваться лабиринт.
-	cell cell2(2, 2, 20, 10);
+	cell cell2(2, 2, 2, 2);
 	availableCoord.push_back(cell2);
 
 	while (!availableCoord.empty()) {
@@ -127,8 +117,6 @@ void Labirinth::generation_labyrint() {
 		short randomIndex = dist(gen);
 		addToAvailableCoord(availableCoord[randomIndex]);
 	}
-
-	print_labyrint();
 }
 
 void Labirinth::examples_of_labyrint() {
@@ -145,18 +133,39 @@ void Labirinth::examples_of_labyrint() {
 			addToAvailableCoord(availableCoord[randomIndex]);
 		}
 
-		print_labyrint();
+		for (int y = 1; y < busyY - 1; y++) {
+			for (int x = 1; x < busyX - 1; x++) {
+				// Меняем цвета.
+				if (charLab.busyCoordLabyrint[x][y] == 0) {
+					cout << "\033[47;30m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 1) {
+					cout << "\033[0m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 2) {
+					cout << "\033[41m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 3) {
+					cout << "\033[42m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 4) {
+					cout << "\033[43m";
+				}
+				setCursorPosition(x - 1, y - 1);
+				cout << " ";
+			}
+		}
 		(void)_getch();
 
 		for (short x = 0; x < busyX; x++) {
-			busyCoordLabyrint[x] = new short[busyY];
+			charLab.busyCoordLabyrint[x] = new short[busyY];
 			for (short y = 0; y < busyY; y++) {
 				if (x == 1 || x == busyX - 2 ||
 					y == 1 || y == busyY - 2) {
-					busyCoordLabyrint[x][y] = 3;
+					charLab.busyCoordLabyrint[x][y] = 3;
 					continue;
 				}
-				busyCoordLabyrint[x][y] = 0;
+				charLab.busyCoordLabyrint[x][y] = 0;
 			}
 		}
 	}
@@ -175,6 +184,45 @@ void Labirinth::steps_of_generation_of_labyrint() {
 		addToAvailableCoord(availableCoord[randomIndex]);
 
 		(void)_getch();
-		print_labyrint();
+		for (int y = 1; y < busyY - 1; y++) {
+			for (int x = 1; x < busyX - 1; x++) {
+				// Меняем цвета.
+				if (charLab.busyCoordLabyrint[x][y] == 0) {
+					cout << "\033[47;30m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 1) {
+					cout << "\033[0m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 2) {
+					cout << "\033[41m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 3) {
+					cout << "\033[42m";
+				}
+				else if (charLab.busyCoordLabyrint[x][y] == 4) {
+					cout << "\033[43m";
+				}
+				setCursorPosition(x - 1, y - 1);
+				cout << " ";
+			}
+		}
+		
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

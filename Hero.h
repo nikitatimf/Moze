@@ -1,19 +1,28 @@
 #pragma once
 #include <iostream>
 #include <windows.h>
+#include <conio.h>
 
-#include "class_labyrint.h"
 #include "cursor.h"
+#include "charlab.h"
 using namespace std;
 
+// Класс, содержащий функции, для работы с персонажем.
 class Hero
 {
-private: 
+private:
 	// Координты персонажа.
 	short heroX, heroY;
+	// Функция, проверяющая, была ли отпущена клавиша WASD.
+	// Если была отпущена - возвращается 0, иначе - 1.
+	short was_passed_button();
+	// Функция, выводящая меню при проигрыше.
+	void lose_function();
+	// Функция, выводящая меню при выйгрыше.
+	void win_function();
 public:
 	Hero();
 	// Функция обрабатывающая нажатие WASD.
-	int hero_handler(Labirinth class_lab);
+	bool hero_handler();
 };
 

@@ -5,9 +5,10 @@
 #include <conio.h>
 
 #include "cursor.h"
-#include "Hero.h"
+#include "charlab.h"
 using namespace std;
 
+// Класс, для работы с лабиринтом.
 class Labirinth
 {
 private:
@@ -38,16 +39,8 @@ private:
 	void addToAvailableCoord(cell p);
 
 public:
-	// Матрица индексов каждой ячейки.
-	// 0 - к ячейке нет никакого доступа.
-	// 1 - ячейка - проход в лабиринте (по ней можно передвигаться).
-	// 2 - доступные для генерации ячейки (эта ячейка может стать проходом).
-	// 3 - граница лабиринта.
-	// 4 - позиция игрока.
-	short** busyCoordLabyrint;
-
-	Labirinth(short labyrintSizeX, short labyrintSizeY);
-
+	Labirinth();
+	
 	// Функция, рисующая лабиринт.
 	void print_labyrint();
 	// Функция, генерирующая лабиринт.
@@ -57,4 +50,7 @@ public:
 	// Функция, показывающая принцип генерации лабиринта.
 	void steps_of_generation_of_labyrint();
 };
+
+
+
 

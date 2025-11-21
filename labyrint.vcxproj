@@ -127,16 +127,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="class_labyrint.cpp" />
+    <ClCompile Include="charlab.cpp" />
+    <ClCompile Include="Labirinth.cpp" />
     <ClCompile Include="Hero.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="main_menu.cpp" />
+    <ClCompile Include="menuse_paragraphs.cpp" />
+    <ClCompile Include="Room.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="class_labyrint.h" />
+    <ClInclude Include="charlab.h" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="Labirinth.h" />
     <ClInclude Include="cursor.h" />
     <ClInclude Include="Hero.h" />
-    <ClInclude Include="json.hpp" />
+    <ClInclude Include="main_menu.h" />
+    <ClInclude Include="menuse_paragraphs.h" />
+    <ClInclude Include="Room.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
