@@ -17,8 +17,6 @@ Labirinth::Labirinth() :
 			charLab.busyCoordLabyrint[x][y] = 0;
 		}
 	}
-
-
 }
 
 void Labirinth::print_labyrint() {
@@ -30,15 +28,20 @@ void Labirinth::print_labyrint() {
 			if (charLab.busyCoordLabyrint[x][y] == 3) {
 				cout << "\033[42m";
 			}
+			// Если ячейка иследованна - красим в черный.
+			if (charLab.explored_way[x][y]) {
+				cout << "\033[0m";
+			}
 			setCursorPosition(x - 1, y - 1);
 			cout << " ";
 		}
 	}
+
 	// Окрашивание ячейки начальной позиции персонажа.
-	setCursorPosition(1, 1); 
+	setCursorPosition(charLab.heroX - 1, charLab.heroY - 1);
 	cout << "\033[43m";
 	cout << " ";
-
+	
 	cout << "\033[0m";
 	setCursorPosition(X - 2, Y - 2);
 	cout << " \n\n";
@@ -76,61 +79,62 @@ void Labirinth::addToAvailableCoord(cell p) {
 	if (charLab.busyCoordLabyrint[p.x][p.y - 2] == 0 &&
 		charLab.busyCoordLabyrint[p.x][p.y - 1] != 3) {
 		charLab.busyCoordLabyrint[p.x][p.y - 2] = 2;
-		availableCoord.push_back(cell(p.x, p.y - 2, p.x, p.y));
+		charLab.availableCoord.push_back(cell(p.x, p.y - 2, p.x, p.y));
 	}
 	// Проверка вправо.
 	if (charLab.busyCoordLabyrint[p.x + 2][p.y] == 0 &&
 		charLab.busyCoordLabyrint[p.x + 1][p.y] != 3) {
 		charLab.busyCoordLabyrint[p.x + 2][p.y] = 2;
-		availableCoord.push_back(cell(p.x + 2, p.y, p.x, p.y));
+		charLab.availableCoord.push_back(cell(p.x + 2, p.y, p.x, p.y));
 	}
 	// Проверка вниз.
 	if (charLab.busyCoordLabyrint[p.x][p.y + 2] == 0 &&
 		charLab.busyCoordLabyrint[p.x][p.y + 1] != 3) {
 		charLab.busyCoordLabyrint[p.x][p.y + 2] = 2;
-		availableCoord.push_back(cell(p.x, p.y + 2, p.x, p.y));
+		charLab.availableCoord.push_back(cell(p.x, p.y + 2, p.x, p.y));
 	}
 	// Проверка влево.
 	if (charLab.busyCoordLabyrint[p.x - 2][p.y] == 0 &&
 		charLab.busyCoordLabyrint[p.x - 1][p.y] != 3) {
 		charLab.busyCoordLabyrint[p.x - 2][p.y] = 2;
-		availableCoord.push_back(cell(p.x - 2, p.y, p.x, p.y));
+		charLab.availableCoord.push_back(cell(p.x - 2, p.y, p.x, p.y));
 	}
 		
 	// Удаление новообразовавшейся ячейки из вектора.
-	auto indxP = find(availableCoord.begin(), availableCoord.end(), p);
-	if (indxP != availableCoord.end()) {
-		availableCoord.erase(indxP);
+	auto indxP = find(charLab.availableCoord.begin(), charLab.availableCoord.end(), p);
+	if (indxP != charLab.availableCoord.end()) {
+		charLab.availableCoord.erase(indxP);
 	}
 }
 
 void Labirinth::generation_labyrint() {
 	// Добавление ячейки из которой будет генерироваться лабиринт.
 	cell cell2(2, 2, 2, 2);
-	availableCoord.push_back(cell2);
+	charLab.availableCoord.push_back(cell2);
 
-	while (!availableCoord.empty()) {
+	while (!charLab.availableCoord.empty()) {
 		random_device rd;
 		mt19937 gen(rd());
-		uniform_int_distribution<> dist(0, availableCoord.size() - 1);
+		uniform_int_distribution<> dist(0, charLab.availableCoord.size() - 1);
 
 		short randomIndex = dist(gen);
-		addToAvailableCoord(availableCoord[randomIndex]);
+		addToAvailableCoord(charLab.availableCoord[randomIndex]);
 	}
+	fileEnd();
 }
 
 void Labirinth::examples_of_labyrint() {
 	while (1) {
 		cell cell2(2, 2, 20, 10);
-		availableCoord.push_back(cell2);
+		charLab.availableCoord.push_back(cell2);
 
-		while (!availableCoord.empty()) {
+		while (!charLab.availableCoord.empty()) {
 			random_device rd;
 			mt19937 gen(rd());
-			uniform_int_distribution<> dist(0, availableCoord.size() - 1);
+			uniform_int_distribution<> dist(0, charLab.availableCoord.size() - 1);
 
 			short randomIndex = dist(gen);
-			addToAvailableCoord(availableCoord[randomIndex]);
+			addToAvailableCoord(charLab.availableCoord[randomIndex]);
 		}
 
 		for (int y = 1; y < busyY - 1; y++) {
@@ -173,15 +177,15 @@ void Labirinth::examples_of_labyrint() {
 
 void Labirinth::steps_of_generation_of_labyrint() {
 	cell cell2(2, 2, 20, 10);
-	availableCoord.push_back(cell2);
+	charLab.availableCoord.push_back(cell2);
 
-	while (!availableCoord.empty()) {
+	while (!charLab.availableCoord.empty()) {
 		random_device rd;
 		mt19937 gen(rd());
-		uniform_int_distribution<> dist(0, availableCoord.size() - 1);
+		uniform_int_distribution<> dist(0, charLab.availableCoord.size() - 1);
 
 		short randomIndex = dist(gen);
-		addToAvailableCoord(availableCoord[randomIndex]);
+		addToAvailableCoord(charLab.availableCoord[randomIndex]);
 
 		(void)_getch();
 		for (int y = 1; y < busyY - 1; y++) {

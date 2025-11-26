@@ -1,7 +1,5 @@
 #include "main_menu.h"
 
-
-
 void printCenter(const string TEXT, bool isPrintTitle) {
 	if (isPrintTitle) {
 		cout << string(getConsoleHeight() / 2 - 6, '\n');
@@ -47,6 +45,8 @@ short clickButton() {
 }
 
 void startGame() {
+	charLab.heroX = 2;
+	charLab.heroY = 2;
 	installAttempts();
 	system("cls");
 	Room room;
@@ -66,21 +66,54 @@ void startGame() {
 		person.hero_handler();
 
 	}
+	fileEnd();
+	system("pause");
 	mainMenu();
 }
 
 void loadGame() {
 	system("cls");
-	cout << R"(Функция на данный момент не доступна.
-Для выхода в главное меню нажмите 2)";
+	// Выгузка данных из файла.
+	const string PATH = "setting.json";
+	ifstream file(PATH);
+	json data;
+	file >> data;
+	file.close();
+	charLab.labyrinthHeight = data["labyrinthHeight"];
+	charLab.labyrinthWidth = data["labyrinthWidth"];
+	charLab.complexity = data["complexity"];
+	
+	charLab.heroX = data["heroX"];
+	charLab.heroY = data["heroY"];
+	charLab.attempts = data["attempts"];
+
+	Room room;
+	Labirinth lab;
+	Hero person;
+
+	for (short i = 0; i < charLab.labyrinthWidth + 2; i++) {
+		for (short j = 0; j < charLab.labyrinthHeight + 2; j++) {
+			charLab.busyCoordLabyrint[i][j] = data["busyCoordLabyrint"][i][j].get<short>();
+		}
+	}
+	for (short i = 0; i < charLab.labyrinthWidth + 2; i++) {
+		for (short j = 0; j < charLab.labyrinthHeight + 2; j++) {
+			charLab.explored_way[i][j] = data["explore_way"][i][j];
+		}
+	}
+	
+	lab.print_labyrint();
+
+	// Выход в главное меню.
 	while (true) {
-		// Выход в главное меню.
-		if (GetAsyncKeyState('2') & 0x8000) {
+		if (GetAsyncKeyState('1') & 0x8000) {
 			if (!was_passed_button()) {
 				system("cls");
 				break;
 			}
 		}
+		person.hero_handler();
+
 	}
 	mainMenu();
 }
@@ -170,7 +203,7 @@ void settings() {
 void aboutProgramm()
 {
 	system("cls");
-	cout << R"(Версия программы: 3.0.
+	cout << R"(Версия программы: 4.0.
 Выполнил: Никита Довгун
 Для выхода в главное меню нажмите 4)";
 	while (true) {
@@ -185,10 +218,10 @@ void aboutProgramm()
 }
 
 void fileStart() {
-	const string PATH = "settings.json";
-	fstream file(PATH, ios::in);
+	const string PATH = "setting.json";
+	ifstream file(PATH);
 	if (!file.is_open()) {
-		file.open(PATH, ios::out);
+		ofstream file(PATH);
 		if (!file.is_open()) {
 			cout << "Ошибка при запуске приложения! Повторите попытку.";
 			exit(0);
@@ -212,22 +245,47 @@ void fileStart() {
 }
 
 void fileEnd() {
-	const string PATH = "settings.json";
-	json data;
+	const string PATH = "setting.json";
 
-	data["labyrinthWidth"] = charLab.labyrinthWidth;
-	data["labyrinthHeight"] = charLab.labyrinthHeight;
-	data["complexity"] = charLab.complexity;
-
-	fstream file(PATH);
+	ofstream file(PATH); 
 	if (!file.is_open()) {
 		cout << "Ошибка сохранения";
 		exit(0);
 	}
 
+	json data;
+
+	data["labyrinthWidth"] = charLab.labyrinthWidth;
+	data["labyrinthHeight"] = charLab.labyrinthHeight;
+	data["complexity"] = charLab.complexity;
+	json busy_arr = json::array();
+	if (charLab.busyCoordLabyrint) {
+		for (short i = 0; i < charLab.labyrinthWidth + 2; i++) {
+			json row = json::array();
+			for (short j = 0; j < charLab.labyrinthHeight + 2; j++) {
+				row.push_back(charLab.busyCoordLabyrint[i][j]);
+			}
+			busy_arr.push_back(row);
+		}
+	}
+	data["busyCoordLabyrint"] = busy_arr;
+	data["heroX"] = charLab.heroX;
+	data["heroY"] = charLab.heroY;
+	data["attempts"] = charLab.attempts;
+	json explore_arr = json::array();
+	if (charLab.explored_way) {
+		for (short i = 0; i < charLab.labyrinthWidth + 2; i++) {
+			json row = json::array();
+			for (short j = 0; j < charLab.labyrinthHeight + 2; j++) {
+				row.push_back(charLab.explored_way[i][j]);
+			}
+			explore_arr.push_back(row);
+		}
+	}
+	data["explore_way"] = explore_arr;
+
 	file << data.dump(4);
 	file.close();
-
 }
 
 short was_passed_button() {

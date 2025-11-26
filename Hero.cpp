@@ -1,80 +1,79 @@
 #include "Hero.h"
-#include "main_menu.h"
-
-Hero::Hero() : heroX(2), heroY(2) {}
 
 bool Hero::hero_handler() {
 	// Если закончились попытки.
 	if (!charLab.attempts) {
 		lose_function();
 	}
-	// Меняем состояние ячейки в матрице ислодованных ячеек на иследованно.
-	charLab.explored_way[heroX - 1][heroY - 1] = true;
-	// Устанавливаем позицию игрока в лабиринте в матрице индексов ячеек лабиринта.
-	charLab.busyCoordLabyrint[heroX][heroY] = 4;
 
 	bool isClick = false;
 	// Нажатие на "W".
 	// Если была нажата клавиша, и ячека, в которую игрок собирается переместится - проход.
-	if ((GetAsyncKeyState(0x57) & 0x8000) && charLab.busyCoordLabyrint[heroX][heroY - 1] == 1) {
+	if ((GetAsyncKeyState(0x57) & 0x8000) && charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY - 1] == 1) {
 		if (!was_passed_button()) {
 			// Изменяем индекс ячейки текущей позиции персонажа на 1.
-			charLab.busyCoordLabyrint[heroX][heroY] = 1;
+			charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY] = 1;
+			// Именяем состояние ячейки тукущей позиции игрока на исслодованно.
+			charLab.explored_way[charLab.heroX][charLab.heroY] = true;
 			// Изменяем индекс ячейки в которую перемещается персонаж на 4.
-			charLab.busyCoordLabyrint[heroX][heroY - 1] = 4;
+			charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY - 1] = 4;
 			charLab.attempts--;
 			// Перекрашиваем ячейку прошлой позиции персонажа в цвет прохода.
-			setCursorPosition(heroX - 1, heroY - 1);
+			setCursorPosition(charLab.heroX - 1, charLab.heroY - 1);
 			cout << "\033[0m";
 			cout << " ";
-			heroY--;
+			charLab.heroY--;
 			isClick = true;
 		}
 	}
 	// Нажатие на "S".
-	else if ((GetAsyncKeyState(0x53) & 0x8000) && charLab.busyCoordLabyrint[heroX][heroY + 1] == 1) {
+	else if ((GetAsyncKeyState(0x53) & 0x8000) && charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY + 1] == 1) {
 		if (!was_passed_button()) {
-			charLab.busyCoordLabyrint[heroX][heroY] = 1;
-			charLab.busyCoordLabyrint[heroX][heroY + 1] = 4;
+			charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY] = 1;
+			charLab.explored_way[charLab.heroX][charLab.heroY] = true;
+			charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY + 1] = 4;
 			charLab.attempts--;
-			setCursorPosition(heroX - 1, heroY - 1);
+			setCursorPosition(charLab.heroX - 1, charLab.heroY - 1);
 			cout << "\033[0m";
 			cout << " ";
-			heroY++;
+			charLab.heroY++;
 			isClick = true;
 		}
 	}
 	// Нажатие на "D".
-	else if ((GetAsyncKeyState(0x44) & 0x8000) && charLab.busyCoordLabyrint[heroX + 1][heroY] == 1) {
+	else if ((GetAsyncKeyState(0x44) & 0x8000) && charLab.busyCoordLabyrint[charLab.heroX + 1][charLab.heroY] == 1) {
 		if (!was_passed_button()) {
-			charLab.busyCoordLabyrint[heroX][heroY] = 1;
-			charLab.busyCoordLabyrint[heroX + 1][heroY] = 4;
+			charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY] = 1;
+			charLab.explored_way[charLab.heroX][charLab.heroY] = true;
+			charLab.busyCoordLabyrint[charLab.heroX + 1][charLab.heroY] = 4;
 			charLab.attempts--;
-			setCursorPosition(heroX - 1, heroY - 1);
+			setCursorPosition(charLab.heroX - 1, charLab.heroY - 1);
 			cout << "\033[0m";
 			cout << " ";
-			heroX++;
+			charLab.heroX++;
 			isClick = true;
 		}
 	}
 	// Нажатие на "A".
-	else if ((GetAsyncKeyState(0x41) & 0x8000) && charLab.busyCoordLabyrint[heroX - 1][heroY] == 1) {
+	else if ((GetAsyncKeyState(0x41) & 0x8000) && charLab.busyCoordLabyrint[charLab.heroX - 1][charLab.heroY] == 1) {
 		if (!was_passed_button()) {
-			charLab.busyCoordLabyrint[heroX][heroY] = 1;
-			charLab.busyCoordLabyrint[heroX - 1][heroY] = 4;
+			charLab.busyCoordLabyrint[charLab.heroX][charLab.heroY] = 1;
+			charLab.explored_way[charLab.heroX][charLab.heroY] = true;
+			charLab.busyCoordLabyrint[charLab.heroX - 1][charLab.heroY] = 4;
 			charLab.attempts--;
-			setCursorPosition(heroX - 1, heroY - 1);
+			setCursorPosition(charLab.heroX - 1, charLab.heroY - 1);
 			cout << "\033[0m";
 			cout << " ";
-			heroX--;
+			charLab.heroX--;
 			isClick = true;
 		}
 	}
 	// Если персонаж переместился.
 	if (isClick) {
+		fileEnd();
 		// Перекрашиваем новую ячейку позиции персонажа.
 		cout << "\033[43m"; 
-		setCursorPosition(heroX - 1, heroY - 1);
+		setCursorPosition(charLab.heroX - 1, charLab.heroY - 1);
 		cout << " ";
 		cout << "\033[0m";
 
@@ -86,13 +85,12 @@ bool Hero::hero_handler() {
 		cout << "" << charLab.attempts << " попыток";
 
 		// Если игрок добрался до выхода.
-		if (heroX == charLab.labyrinthWidth - 1 && heroY == charLab.labyrinthHeight - 1) {
+		if (charLab.heroX == charLab.labyrinthWidth - 1 && charLab.heroY == charLab.labyrinthHeight - 1) {
 			win_function();
 		}
 	}
 	return isClick ? true : false;
 }
-
 
 short Hero::was_passed_button() {
 	bool button = false;
@@ -122,6 +120,8 @@ short Hero::was_passed_button() {
 }
 
 void Hero::lose_function() {
+	charLab.heroX = 2;
+	charLab.heroY = 2;
 	system("cls");
 	cout << "You lose\nPress any Enter to come to main menu";
 	while (true) {
@@ -133,6 +133,8 @@ void Hero::lose_function() {
 }
 
 void Hero::win_function() {
+	charLab.heroX = 2;
+	charLab.heroY = 2;
 	system("cls");
 	cout << "You win\nPress any Enter to come to main menu";
 	while (true) {

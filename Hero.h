@@ -5,14 +5,13 @@
 
 #include "cursor.h"
 #include "charlab.h"
+#include "main_menu.h"
 using namespace std;
 
 // Класс, содержащий функции, для работы с персонажем.
 class Hero
 {
 private:
-	// Координты персонажа.
-	short heroX, heroY;
 	// Функция, проверяющая, была ли отпущена клавиша WASD.
 	// Если была отпущена - возвращается 0, иначе - 1.
 	short was_passed_button();
@@ -21,7 +20,6 @@ private:
 	// Функция, выводящая меню при выйгрыше.
 	void win_function();
 public:
-	Hero();
 	// Функция обрабатывающая нажатие WASD.
 	bool hero_handler();
 };

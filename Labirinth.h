@@ -6,6 +6,7 @@
 
 #include "cursor.h"
 #include "charlab.h"
+#include "menuse_paragraphs.h"
 using namespace std;
 
 // Класс, для работы с лабиринтом.
@@ -17,23 +18,6 @@ private:
 
 	// Размер матрицы busyCoordLabyrint.
 	const short busyX, busyY;
-
-	// Структура для ячеек под индесом 2.
-	struct cell {
-		// Х, Y - координаты ячейки.
-		// ParentX, ParentY - координаты родительской ячеки.
-		cell(short X, short Y, short ParentX, short ParentY) :
-			x(X), y(Y), parentX(ParentX), parentY(ParentY) 
-		{}
-		short x, y,
-			  parentX, parentY;
-		bool operator==(const cell& other) const {
-			return x == other.x && y == other.y;
-		}
-	};
-
-	// Вектор ячеек под индексом 2.
-	vector<cell> availableCoord;
 
 	// Функция, добавляющая ячейки под индексом 2 в вектор.
 	void addToAvailableCoord(cell p);
