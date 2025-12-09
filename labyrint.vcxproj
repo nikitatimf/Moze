@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bomber.cpp" />
     <ClCompile Include="charlab.cpp" />
     <ClCompile Include="Labirinth.cpp" />
     <ClCompile Include="Hero.cpp" />
@@ -135,8 +136,11 @@
     <ClCompile Include="main_menu.cpp" />
     <ClCompile Include="menuse_paragraphs.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Teleport.cpp" />
+    <ClCompile Include="Vizor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bomber.h" />
     <ClInclude Include="charlab.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Labirinth.h" />
@@ -145,6 +149,8 @@
     <ClInclude Include="main_menu.h" />
     <ClInclude Include="menuse_paragraphs.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="Teleport.h" />
+    <ClInclude Include="Vizor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

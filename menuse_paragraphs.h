@@ -9,6 +9,9 @@
 #include "Hero.h"
 #include "Room.h"
 #include "Labirinth.h"
+#include "Vizor.h"
+#include "Teleport.h"
+#include "Bomber.h"
 #include "charlab.h"
 #include "json.hpp"
 
@@ -29,6 +32,9 @@ void startGame();
 
 // Функция окна "Загрузить игру".
 void loadGame();
+
+// Функция окна "Рейтинговая таблица".
+void rating();
 
 // Функция, рисующая окно "Настройки".
 void drawSettings(bool isLeft);
@@ -51,4 +57,7 @@ short was_passed_button();
 
 // Функция, устанавливающая число попыток.
 void installAttempts();
+
+// Функция для выбора персонажей.
+void chose_hero();
 

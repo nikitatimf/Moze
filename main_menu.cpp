@@ -7,11 +7,13 @@ void mainMenu() {
 	cout << endl;
 	printCenter("2. Загрузить игру");
 	cout << endl;
-	printCenter("3. Настройки");
+	printCenter("3. Рейтинговая таблица");
 	cout << endl;
-	printCenter("4. О программе");
+	printCenter("4. Настройки");
 	cout << endl;
-	printCenter("5. Выход");
+	printCenter("5. О программе");
+	cout << endl;
+	printCenter("6. Выход");
 
 	short whatButtonWasClicked = clickButton();
 	switch (whatButtonWasClicked) {
@@ -24,14 +26,18 @@ void mainMenu() {
 		break;
 	}
 	case 3: {
-		settings();
+		rating();
 		break;
 	}
 	case 4: {
-		aboutProgramm();
+		settings();
 		break;
 	}
 	case 5: {
+		aboutProgramm();
+		break;
+	}
+	case 6: {
 		fileEnd();
 		exit(0);
 	}

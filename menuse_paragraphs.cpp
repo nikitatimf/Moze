@@ -38,6 +38,11 @@ short clickButton() {
 			whatButtonWasClicked = 5;
 			break;
 		}
+		if (GetAsyncKeyState('6') & 0x8000) {
+			whatButtonWasClicked = 6;
+			break;
+		}
+
 	}
 	if (!was_passed_button()) {
 		return whatButtonWasClicked;
@@ -45,29 +50,42 @@ short clickButton() {
 }
 
 void startGame() {
+	chose_hero();
 	charLab.heroX = 2;
 	charLab.heroY = 2;
+	charLab.count_teleport = 6;
 	installAttempts();
 	system("cls");
 	Room room;
 	Labirinth lab;
 	Hero person;
+	Vizor vizor;
+	Teleport teleport;
+	Bomber bomber;
 	lab.generation_labyrint();
 	lab.print_labyrint();
 
 	// Выход в главное меню.
 	while (true) {
-		if (GetAsyncKeyState('1') & 0x8000) {
+		if (GetAsyncKeyState(0x31) & 0x8000) {
 			if (!was_passed_button()) {
 				system("cls");
 				break;
 			}
 		}
-		person.hero_handler();
+		if (person.hero_handler() && charLab.hero == 1) {
+			vizor.vizibility();
+		}
+		else if (charLab.hero == 2) {
+			teleport.teleport();
+		}
+		else if (charLab.hero == 3) {
+			bomber.boom();
+		}
+
 
 	}
 	fileEnd();
-	system("pause");
 	mainMenu();
 }
 
@@ -86,10 +104,14 @@ void loadGame() {
 	charLab.heroX = data["heroX"];
 	charLab.heroY = data["heroY"];
 	charLab.attempts = data["attempts"];
+	charLab.count_teleport = data["count_teleport"];
 
 	Room room;
 	Labirinth lab;
 	Hero person;
+	Vizor vizor;
+	Teleport teleport;
+	Bomber bomber;
 
 	for (short i = 0; i < charLab.labyrinthWidth + 2; i++) {
 		for (short j = 0; j < charLab.labyrinthHeight + 2; j++) {
@@ -106,16 +128,40 @@ void loadGame() {
 
 	// Выход в главное меню.
 	while (true) {
-		if (GetAsyncKeyState('1') & 0x8000) {
+		if (GetAsyncKeyState(0x31) & 0x8000) {
 			if (!was_passed_button()) {
 				system("cls");
 				break;
 			}
 		}
-		person.hero_handler();
+		if (person.hero_handler() && charLab.hero == 1) {
+			vizor.vizibility();
+		}
+		else if (charLab.hero == 2) {
+			teleport.teleport();
+		}
+		else if (charLab.hero == 3) {
+			bomber.boom();
+		}
 
 	}
 	mainMenu();
+}
+
+void rating() {
+	system("cls");
+	cout << "Рейтинговая таблица\n";
+	cout << "1 - " << charLab.rating[0] << endl;
+	cout << "2 - " << charLab.rating[1] << endl;
+	cout << "3 - " << charLab.rating[2] << endl;
+	while (true) {
+		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) {
+			if (!was_passed_button()) {
+				system("cls");
+				mainMenu();
+			}
+		}
+	}
 }
 
 void drawSettings(bool isLeft) {
@@ -203,11 +249,11 @@ void settings() {
 void aboutProgramm()
 {
 	system("cls");
-	cout << R"(Версия программы: 4.0.
+	cout << R"(Версия программы: 5.0.
 Выполнил: Никита Довгун
-Для выхода в главное меню нажмите 4)";
+Для выхода в главное меню нажмите 5)";
 	while (true) {
-		if (GetAsyncKeyState('4') & 0x8000) {
+		if (GetAsyncKeyState(0x35) & 0x8000) {
 			if (!was_passed_button()) {
 				system("cls");
 				break;
@@ -230,6 +276,9 @@ void fileStart() {
 		data["labyrinthWidth"] = 39;
 		data["labyrinthHeight"] = 19;
 		data["complexity"] = "Легко";
+		data["count_teleport"] = 6;
+		data["count_boom"] = 6;
+		data["rating"] = {100, 100, 100};
 
 		file << data.dump(4);
 		file.close();
@@ -241,6 +290,11 @@ void fileStart() {
 		charLab.labyrinthHeight = data["labyrinthHeight"];
 		charLab.labyrinthWidth = data["labyrinthWidth"];
 		charLab.complexity = data["complexity"];
+		charLab.count_teleport = data["count_teleport"];
+		charLab.count_teleport = data["count_boom"];
+		for (short i = 0; i < 3; i++) {
+			charLab.rating[i] = data["rating"][i];
+		}
 	}
 }
 
@@ -283,6 +337,11 @@ void fileEnd() {
 		}
 	}
 	data["explore_way"] = explore_arr;
+	data["count_teleport"] = charLab.count_teleport;
+	data["count_boom"] = charLab.count_boom;
+	for (short i = 0; i < 3; i++) {
+		data["rating"][i] = charLab.rating[i];
+	}
 
 	file << data.dump(4);
 	file.close();
@@ -299,24 +358,56 @@ short was_passed_button() {
 		else if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) {
 			button = true;
 		}
+		// Проверка на нажатие стрелки вверх.
+		else if (GetAsyncKeyState(VK_UP) & 0x8000) {
+			button = true;
+		}
+		// Проверка на нажатие стрелки вниз.
+		else if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
+			button = true;
+		}
 		// Проверка на нажатие "1".
-		else if (GetAsyncKeyState('1') & 0x8000) {
+		else if (GetAsyncKeyState(0x31) & 0x8000) {
 			button = true;
 		}
 		// Проверка на нажатие "2".
-		else if (GetAsyncKeyState('2') & 0x8000) {
+		else if (GetAsyncKeyState(0x32) & 0x8000) {
 			button = true;
 		}
 		// Проверка на нажатие "3".
-		else if (GetAsyncKeyState('3') & 0x8000) {
+		else if (GetAsyncKeyState(0x33) & 0x8000) {
 			button = true;
 		}
 		// Проверка на нажатие "4".
-		else if (GetAsyncKeyState('4') & 0x8000) {
+		else if (GetAsyncKeyState(0x34) & 0x8000) {
 			button = true;
 		}
 		// Проверка на нажатие "5".
-		else if (GetAsyncKeyState('5') & 0x8000) {
+		else if (GetAsyncKeyState(0x35) & 0x8000) {
+			button = true;
+		}
+		// Проверка нажатия "Q" "W".
+		else if ((GetAsyncKeyState(0x57) & 0x8000) &&
+			(GetAsyncKeyState(0x51) & 0x8000)) {
+			button = true;
+		}
+		// Проверка нажатия "Q" "A".
+		else if ((GetAsyncKeyState(0x41) & 0x8000) &&
+			(GetAsyncKeyState(0x51) & 0x8000)) {
+			button = true;
+		}
+		// Проверка нажатия "Q" "S".
+		else if ((GetAsyncKeyState(0x53) & 0x8000) &&
+			(GetAsyncKeyState(0x51) & 0x8000)) {
+			button = true;
+		}
+		// Проверка нажатия "Q" "D".
+		else if ((GetAsyncKeyState(0x44) & 0x8000) &&
+			(GetAsyncKeyState(0x51) & 0x8000)) {
+			button = true;
+		}
+		// Проверка нажатия "Q".
+		else if (GetAsyncKeyState(0x51) & 0x8000) {
 			button = true;
 		}
 		else if (button) {
@@ -329,4 +420,73 @@ short was_passed_button() {
 
 void installAttempts() {
 	charLab.attempts = (charLab.labyrinthWidth * charLab.labyrinthHeight) / 2;
+}
+
+void chose_hero() {
+	struct heroies_set {
+		string name;
+		string description;
+	};
+	
+	vector<heroies_set> heroies;
+	heroies.push_back({ "Обычный", "Нет способностей\n" });
+	heroies.push_back({ "Визард", "Может просматривать область вокруг себя." });
+	heroies.push_back({ "Призрак", "Может телепортироваться через стены.\nДля телепортации нажмите кнопку \"Q\" + клавишу направления телепорта." });
+	heroies.push_back({ "Бомбер", "Может подрывть стены вокруг себя.\nДля взрыва нажмите кнопку \"Q\"." });
+
+	system("cls");
+	cout << "Выберите персонажа\n\n";
+	cout << heroies[charLab.hero].name << endl;
+	cout << heroies[charLab.hero].description << endl << endl;
+
+	cout << "Следующий\n";
+	cout << "\033[34mПродолжить\033[37m";
+
+	bool isContinue = true;
+
+	while (true) {
+		if (GetAsyncKeyState(VK_RETURN) & 0x8000) {
+			if (!was_passed_button()) {
+				// Если указатель (синий цвет кнопки) на кнопке продолжить.
+				if (isContinue) {
+					break;
+				}
+				else {
+					charLab.hero = charLab.hero == 3 ? 0 : charLab.hero + 1;
+					setCursorPosition(0, 2);
+					cout << "                                      ";
+					setCursorPosition(0, 2);
+					cout << heroies[charLab.hero].name << endl;
+					cout << "                                                                         \n";
+					cout << "                                                                                ";
+					setCursorPosition(0, 3);
+					cout << heroies[charLab.hero].description << endl;
+
+				}
+			}
+		}
+
+		// Если нажали стрелку вверх.
+		else if (GetAsyncKeyState(VK_UP) & 0x8000) {
+			isContinue = false;
+			if (!was_passed_button()) {
+				setCursorPosition(0, 6);
+				cout << "\033[34mСледующий\033[37m";
+				setCursorPosition(0, 7);
+				cout << "Продолжить";
+			}
+		}
+		// Если нажали стрелку вниз.
+		else if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
+			isContinue = true;
+			if (!was_passed_button()) {
+				setCursorPosition(0, 6);
+				cout << "Следующий";
+				setCursorPosition(0, 7);
+				cout << "\033[34mПродолжить\033[37m";
+			}
+		}
+		
+	}
+
 }

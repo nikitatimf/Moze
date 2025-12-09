@@ -23,6 +23,8 @@ bool Hero::hero_handler() {
 			cout << "\033[0m";
 			cout << " ";
 			charLab.heroY--;
+			// Записываем последнюю нажатую кнопку.
+			charLab.last_click_button = 1;
 			isClick = true;
 		}
 	}
@@ -37,6 +39,7 @@ bool Hero::hero_handler() {
 			cout << "\033[0m";
 			cout << " ";
 			charLab.heroY++;
+			charLab.last_click_button = 3;
 			isClick = true;
 		}
 	}
@@ -51,6 +54,7 @@ bool Hero::hero_handler() {
 			cout << "\033[0m";
 			cout << " ";
 			charLab.heroX++;
+			charLab.last_click_button = 4;
 			isClick = true;
 		}
 	}
@@ -65,6 +69,7 @@ bool Hero::hero_handler() {
 			cout << "\033[0m";
 			cout << " ";
 			charLab.heroX--;
+			charLab.last_click_button = 2;
 			isClick = true;
 		}
 	}
@@ -122,6 +127,8 @@ short Hero::was_passed_button() {
 void Hero::lose_function() {
 	charLab.heroX = 2;
 	charLab.heroY = 2;
+	charLab.count_teleport = 6;
+	charLab.count_boom = 6;
 	system("cls");
 	cout << "You lose\nPress any Enter to come to main menu";
 	while (true) {
@@ -133,9 +140,31 @@ void Hero::lose_function() {
 }
 
 void Hero::win_function() {
+	system("cls");
+	// Подсчитываем результат.
+	// Результат - это процент использованных ходов от общего количсетва ходов.
+	float result = 100 - ((float)charLab.attempts / (float)((charLab.labyrinthWidth * charLab.labyrinthHeight) / 2)) * 100;
+
+	if (result < charLab.rating[2]) {
+		if (result < charLab.rating[0]) {
+			charLab.rating[2] = charLab.rating[1];
+			charLab.rating[1] = charLab.rating[0];
+			charLab.rating[0] = result;
+		}
+		else if (result < charLab.rating[1]) {
+			charLab.rating[2] = charLab.rating[1];
+			charLab.rating[1] = result;
+		}
+		else {
+			charLab.rating[2] = result;
+		}
+	}
+
+
 	charLab.heroX = 2;
 	charLab.heroY = 2;
-	system("cls");
+	charLab.count_teleport = 6;
+	charLab.count_boom = 6;
 	cout << "You win\nPress any Enter to come to main menu";
 	while (true) {
 		if (GetAsyncKeyState(VK_RETURN) & 0x8000) {

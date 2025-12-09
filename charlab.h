@@ -50,6 +50,27 @@ struct characteristicsOfTheLabyrinth {
 	// 4 - позиция игрока.
 	short** busyCoordLabyrint;
 
+	// Последняя нажатая кнопка.
+	// 1 - w.
+	// 2 - a.
+	// 3 - s.
+	// 4 - d.
+	short last_click_button = 0;
+
+	// Количество телепортов.
+	short count_teleport = 6;
+
+	// Коичество взрывов.
+	short count_boom = 6;
+
+	// Выбранная способность.
+	// 0 - без способности.
+	// 1 - область видимости вокруг персонажа.
+	// 2 - телепортация.
+	// 3 - взрыв стен.
+	short hero = 3;
+
+	float rating[3] = { 100, 100, 100 };
 };
 
 extern characteristicsOfTheLabyrinth charLab;

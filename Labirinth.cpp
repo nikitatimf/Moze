@@ -45,7 +45,13 @@ void Labirinth::print_labyrint() {
 	cout << "\033[0m";
 	setCursorPosition(X - 2, Y - 2);
 	cout << " \n\n";
-	cout << "Осталось " << charLab.attempts << " попыток";
+	cout << "Осталось " << charLab.attempts << " попыток\n";
+	if (charLab.hero == 2) {
+		cout << "Осталось " << charLab.count_teleport << " телепортаций";
+	}
+	else if (charLab.hero == 3) {
+		cout << "Осталось " << charLab.count_boom << " взрывов";
+	}
 }
 
 void Labirinth::addToAvailableCoord(cell p) {
